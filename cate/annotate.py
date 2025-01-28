@@ -9,15 +9,19 @@ class EntityLocations(ABC):
     def __init__(self, fname, angle_nr):
         self.fname = fname
         self.angle_nr = angle_nr
-
+        
         try:
             self._locations = np.load(fname, allow_pickle=True).item()
+            
+            print(f'LOCATIONS ARE SET: {self._locations.keys()}')
         except FileNotFoundError:
             self._locations = dict()
 
     def locations(self):
         if len(self._locations) == 0:
             raise Exception("Location file is empty.")
+        # print('location:')
+        # print(self._locations.keys())
 
         return dict(sorted(self._locations[self.angle_nr].items()))
 
@@ -111,12 +115,15 @@ class Annotator:
             return
 
         if event.xdata is None or event.ydata is None:
+            print("clicking has no effect outside image")
             return  # clicking has no effect outside the image
 
         if event.inaxes != self._proj_ax:
+            print('clicking has no effect outside axes')
             return  # or outside of the axes
 
         if not event.dblclick:
+            print('we need single click to zoom and dubble click for action?')
             return  # we need single click to zoom
 
         self._entities[self._active_entity] = [event.xdata, event.ydata]
